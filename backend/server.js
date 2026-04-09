@@ -1,3 +1,5 @@
+require("dotenv").config();
+const axios = require("axios");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -8,6 +10,7 @@ const clusterLogs = require("./utils/clusterLogs");
 const serviceState = require("./utils/serviceState");
 
 const RLAgent = require("./rlAgent");
+
 
 const app = express();
 app.use(cors());
@@ -20,11 +23,7 @@ const io = new Server(server, {
 
 // ================= DATABASE CONNECTION =================
 
-mongoose.connect(
-  "mongodb+srv://aionixUser:w%26DXUPwGum1%24@cluster0.dfdfhfi.mongodb.net/aionix?retryWrites=true&w=majority"
-)
-.then(() => console.log("✅ MongoDB Atlas Connected"))
-.catch((err) => console.error("❌ MongoDB Connection Error:", err));
+mongoose.connect( "mongodb+srv://aionixUser:w%26DXUPwGum1%24@cluster0.dfdfhfi.mongodb.net/aionix?retryWrites=true&w=majority" ) .then(() => console.log("✅ MongoDB Atlas Connected")) .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 // ================= SCHEMAS =================
 
@@ -266,3 +265,19 @@ server.listen(PORT, async () => {
   await rlAgent.loadQTable();
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
+setInterval(() => {
+  const log = {
+    service: "render-instance",
+    message: "Auto log from cloud instance",
+    severity: Math.random() > 0.7 ? "HIGH" : "LOW",
+    anomaly: Math.random() > 0.7
+  };
+
+  require("axios").post(
+    "https://aionix-main.onrender.com/api/logs",
+    log
+  );
+
+  console.log("☁️ Cloud log sent");
+}, 5000);
